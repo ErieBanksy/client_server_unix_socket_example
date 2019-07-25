@@ -2,6 +2,6 @@
 
 The work of the program shows an example of interaction between the server and the client through an Unix socket.
 
-The program is building on Linux-like systems using a file.
+The program is building on Linux-like systems with using a Makefile.
 
 
