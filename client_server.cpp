@@ -39,7 +39,7 @@ char unixSocketPath[50];
 int main() {
     signal(SIGINT, sigHandler);
 
-    string unixSocketPathTest = "/home/pi/controller_test/controller_test.socket";
+    string unixSocketPathTest = "/home/pi/test.socket";
     if (initUnixSocketPath(unixSocketPathTest) == false) {
         cout << "US: Unix socket path not initialized" << endl;
         return -1;
@@ -49,7 +49,6 @@ int main() {
         return -1;
     }
 
-//    thread(serverOperation).detach();
     thread(clientOperation).detach();
     thread(serverOperation).detach();
 
@@ -61,6 +60,13 @@ int main() {
 }
 
 
+/**
+* \brief Функция работы сервера.
+*
+* Пока не будет совершен выход из программы, сервер будет работать в потоке, 
+* получая и отправляя сообщения.
+*
+*/
 void serverOperation() {
     char readData[maxSizeDataFromUS] = { 0 };
     int countByteFromSock = 0;
@@ -102,11 +108,18 @@ void serverOperation() {
 }
 
 
+/**
+* \brief Функция работы клиента.
+*
+* Пока не будет совершен выход из программы, клиент будет отправлять приветственное 
+* сообщение серверу и принимать ответ на него.
+*
+*/
 void clientOperation() {
     socket_t sentSocketd;
     struct sockaddr_un domainSockAddr;
     char readData[maxSizeDataFromUS] = { 0 };
-    char unixSocketPath[50] = "/home/pi/controller_test/controller_test.socket";
+    char unixSocketPath[50] = "/home/pi/test.socket";
 
     if ((sentSocketd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
         cout << "ERROR: Unix socket error..." << endl;
@@ -160,6 +173,13 @@ void clientOperation() {
 }
 
 
+/**
+* \brief Функция инициализации unix сокета.
+*
+* Пока не будет совершен выход из программы, клиент будет отправлять приветственное 
+* сообщение серверу и принимать ответ на него.
+*
+*/
 bool initUnixSocket() {
     if ((listenSocketd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
         cout << "ERROR: Unix socket error..." << endl;
@@ -198,6 +218,9 @@ bool initUnixSocket() {
 }
 
 
+/**
+* \brief Функция инициализации пути unix сокета.
+*/
 bool initUnixSocketPath(string path) {
     if (path.size() == 0) {
         cout << "Error: unixSocketPath is empty in " << __FUNCTION__ << endl;
@@ -210,12 +233,22 @@ bool initUnixSocketPath(string path) {
 }
 
 
+/**
+* \brief Функция обработчик полученного сигнала. 
+*
+* Нужна для завершения работы программы.
+*
+* \param [in] sig - полученный сигнал.
+*/
 void sigHandler(int sig) {
     cout << "Break received, exiting!" << endl;
     force_exit = true;
 }
 
 
+/**
+* \brief Функция ожидания завершения работы программы. 
+*/
 void waitEndingProgramm() {
     while (!force_exit) {
         sleep(10);
